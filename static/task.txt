@@ -1,0 +1,33 @@
+docker run -d \
+  --name fastapi_app \
+  --link postgres:postgres \
+  -e DATABASE_URL=postgres://myuser:mypassword@postgres/lookup_service \
+  -p 3000:3000 \
+  fastapi_app
+  
+  
+  
+docker run -d \
+  --name postgres \
+  -e POSTGRES_DB=lookup_service \
+  -e POSTGRES_USER=myuser \
+  -e POSTGRES_PASSWORD=mypassword \
+  -p 5432:5432 \
+  postgres:13
+  
+  
+  
+CREATE TABLE IF NOT EXISTS query_log (
+    id SERIAL PRIMARY KEY,
+    domain VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    query_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+docker exec -it postgres psql -U user -d lookup_service
+SELECT * FROM public.query_log;
+SELECT domain, ip_address, query_time FROM query_log ORDER BY query_time DESC LIMIT 20;
+
