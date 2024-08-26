@@ -1,0 +1,147 @@
+swagger: "2.0"
+info:
+  title: Interview challenge
+  version: 1.0.0
+  description: This is a custom Swagger schema.
+paths:
+  /:
+    get:
+      summary: Show current status
+      description: Show current status
+      operationId: query_status
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.Status'
+  /health:
+    get:
+      summary: Show health status
+      description: Show health status
+      operationId: query_health
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.HealthStatus'
+  /v1/history:
+    get:
+      summary: List queries
+      description: List queries
+      operationId: queries_history
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Query'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+  /v1/tools/lookup:
+    get:
+      summary: Lookup domain and return all IPv4 addresses
+      description: Lookup domain and return all IPv4 addresses
+      operationId: lookup_domain
+      produces:
+        - application/json
+      parameters:
+        - name: domain
+          in: query
+          description: Domain name
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Query'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+  /v1/tools/validate:
+    post:
+      summary: Simple IP validation
+      description: Simple IP validation
+      operationId: validate_ip
+      produces:
+        - application/json
+      parameters:
+        - name: request
+          in: body
+          description: IP to validate
+          required: true
+          schema:
+            $ref: '#/definitions/handlers.ValidateIPRequest'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ValidateIPResponse'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+definitions:
+  handlers.HealthStatus:
+    type: object
+    properties:
+      status:
+        type: string
+  handlers.Status:
+    type: object
+    properties:
+      date:
+        type: integer
+      kubernetes:
+        type: boolean
+      version:
+        type: string
+  handlers.ValidateIPRequest:
+    type: object
+    properties:
+      ip_address:
+        type: string
+  handlers.ValidateIPResponse:
+    type: object
+    properties:
+      status:
+        type: boolean
+  models.Address:
+    type: object
+    properties:
+      ip:
+        type: string
+      queryID:
+        type: integer
+  models.Query:
+    type: object
+    properties:
+      addresses:
+        type: array
+        items:
+          $ref: '#/definitions/models.Address'
+      client_ip:
+        type: string
+      created_time:
+        type: integer
+      domain:
+        type: string
+      queryID:
+        type: integer
+  utils.HTTPError:
+    type: object
+    properties:
+      message:
+        type: string

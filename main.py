@@ -1,21 +1,23 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-from psycopg2.extras import RealDictCursor
-from datetime import datetime
+from pydantic import BaseModel, validator
+import ipaddress
 import socket
 import os
 import logging
 import psycopg2
+from psycopg2.extras import RealDictCursor
+from typing import List
+from datetime import datetime
 import time
+import yaml
+from schemas import LookupRequest, LookupResponse, QueryLogResponse, HistoryResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Initialize FastAPI
 app = FastAPI()
 
-# Serve static files (Swagger UI, etc.)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 # Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgres://user:password@postgres/lookup_service")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgres://myuser:mypassword@postgres/lookup_service")
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
@@ -49,8 +51,27 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+# IPv4 Validation Model
+class IPv4ValidateRequest(BaseModel):
+    ip_address: str  # Field name to match the request body
+
+    @validator('ip_address')
+    def validate_ip_address(cls, v):
+        try:
+            ip = ipaddress.ip_address(v)
+            if not isinstance(ip, ipaddress.IPv4Address):
+                raise ValueError("Not a valid IPv4 address")
+        except ValueError:
+            raise ValueError("Not a valid IP address")
+        return v
+
+# IPv4 Validation endpoint
+@app.post("/v1/tools/validate")
+async def validate(request: IPv4ValidateRequest):
+    return {"message": "Validation successful", "ip_address": request.ip_address}
+
 # Lookup endpoint
-@app.get("/v1/tools/lookup", response_model=dict)
+@app.get("/v1/tools/lookup", response_model=LookupResponse)
 async def lookup(domain: str):
     try:
         ip_addresses = [ip for ip in socket.gethostbyname_ex(domain)[2] if ':' not in ip]
@@ -84,7 +105,7 @@ async def lookup(domain: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # History endpoint
-@app.get("/v1/history", response_model=dict)
+@app.get("/v1/history", response_model=HistoryResponse)
 async def history():
     try:
         conn = get_db_connection()
@@ -117,14 +138,18 @@ async def history():
         raise HTTPException(status_code=500, detail="Error retrieving history")
 
 # Prometheus metrics
-from prometheus_fastapi_instrumentator import Instrumentator
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
-# Serve Swagger UI
-@app.get("/docs", include_in_schema=False)
-async def custom_swagger_ui():
-    return StaticFiles(directory="static", html=True).get_response("index.html")
+# Custom OpenAPI Schema
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    with open("openapi_schema.yaml", "r") as f:
+        return yaml.safe_load(f)
+
+app.openapi = custom_openapi
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=3000)
+
