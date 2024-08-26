@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel 
 from typing import List
+from ipaddress import IPv4Address
 
 class LookupRequest(BaseModel):
     domain: str
@@ -16,3 +17,6 @@ class QueryLogResponse(BaseModel):
 
 class HistoryResponse(BaseModel):
     history: List[QueryLogResponse]
+
+class ValidateRequest(BaseModel):
+    ip_address: IPv4Address

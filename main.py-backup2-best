@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 import socket
 import os
 import logging
@@ -9,9 +9,18 @@ from schemas import LookupRequest, LookupResponse, QueryLogResponse, HistoryResp
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from prometheus_fastapi_instrumentator import Instrumentator
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, validator
 import ipaddress
 from typing import List
+import time
+import yaml
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+
+
 
 # Initialize FastAPI
 app = FastAPI()
@@ -34,11 +43,6 @@ def wait_for_db():
 @app.on_event("startup")
 async def startup_event():
     wait_for_db()
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("Shutting down gracefully...")
-    # Here you can close database connections or perform other cleanup operations if needed
 
 # Root endpoint
 @app.get("/", response_model=dict)
@@ -128,11 +132,9 @@ async def history():
 async def validate_ip(request: ValidateRequest):
     ip_address = str(request.ip_address)  # Convert IPv4Address to string
     try:
-        ipaddress.ip_address(ip_address)
-        if not isinstance(ipaddress.ip_address(ip_address), ipaddress.IPv4Address):
-            raise HTTPException(status_code=400, detail="Invalid IPv4 address")
+        socket.inet_aton(ip_address)
         return {"is_valid": True}
-    except ValueError:
+    except socket.error:
         raise HTTPException(status_code=400, detail="Invalid IPv4 address")
 
 # Prometheus metrics
@@ -147,26 +149,14 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 # Logging setup
-#logging.basicConfig(level=logging.INFO)
-#logger = logging.getLogger(__name__)
-
-# Set up logging configuration
-log_file_path = '/app/logs/access.log'
-if not os.path.exists('/app/logs'):
-    os.makedirs('/app/logs')
-
-logging.basicConfig(
-    filename=log_file_path,
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-
-
-
+# Graceful shutdown
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Shutting down gracefully...")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=3000, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=3000)

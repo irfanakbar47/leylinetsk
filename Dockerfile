@@ -8,6 +8,8 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN mkdir -p /app/logs && chmod -R 755 /app/logs
+
 # Copy application code
 COPY . .
 

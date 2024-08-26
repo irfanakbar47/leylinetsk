@@ -23,6 +23,8 @@ services:
       DATABASE_URL: postgres://myuser:mypassword@postgres/lookup_service
     ports:
       - "3000:3000"
+    volumes: 
+      - ./logs:/app/logs
     depends_on:
       - postgres
 
