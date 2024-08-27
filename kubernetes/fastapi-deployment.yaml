@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: fastapi-app
+        image: irfan611/task:1.0
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: fastapi-configmap
+        volumeMounts:
+        - mountPath: /app/logs
+          name: log-storage
+      volumes:
+      - name: log-storage
+        hostPath:
+          path: /var/log/fastapi  # Path on the host machine to store logs
