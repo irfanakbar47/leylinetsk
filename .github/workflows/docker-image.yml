@@ -68,22 +68,26 @@ jobs:
           echo "testing application after test case written"
   helm-package:
     runs-on: ubuntu-latest
-    #needs: test
+    needs: build
     steps:
       - uses: actions/checkout@v4
       - name: Set up Helm
         uses: azure/setup-helm@v1
         with:
           version: v3.9.2
+      - name: Echo TIMESTAMP
+        run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
       - name: Update Helm values
         run: |
-          sed -i "s/tag: .*/tag: ${TIMESTAMP}/" ./kubernetes/helm/values.yaml  
+          sed -i "s/tag: .*/tag: ${{ env.TIMESTAMP }}/" ./kubernetes/helm/values.yaml  
       - name: Package Helm chart
         run: |
           TIMESTAMP=$(date +%s)
           helm package ./kubernetes/helm --version $TIMESTAMP
+      - name: List files
+        run: ls -lh ./kubernetes/helm/
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v2
         with:
           name: helm-chart
-          path: ./kubernetes/*.tgz
+          path: ./kubernetes/helm/*.tgz
