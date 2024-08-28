@@ -61,7 +61,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install fastapi[all] httpx pytest
+          pip install fastapi httpx pytest
           pip install -r requirements.txt
       - name: Run Tests
         run: |
