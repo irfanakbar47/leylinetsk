@@ -89,5 +89,5 @@ jobs:
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v2
         with:
-          name: helm-chart
+          name: helm-chart-${{ env.TIMESTAMP }}
           path: ./kubernetes/helm/*.tgz
