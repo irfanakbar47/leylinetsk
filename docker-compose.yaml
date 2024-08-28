@@ -1,5 +1,4 @@
 version: '3.3'
-
 services:
   postgres:
     image: postgres:13
@@ -13,7 +12,6 @@ services:
       - ./db/init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
-
   fastapi_app:
     build:
       context: .
@@ -27,6 +25,5 @@ services:
       - ./logs:/app/logs
     depends_on:
       - postgres
-
 volumes:
   postgres_data:
