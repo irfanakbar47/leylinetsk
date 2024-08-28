@@ -77,8 +77,7 @@ jobs:
           version: v3.9.2
       - name: Package Helm chart
         run: |
-          helm package ./kubernetes/helm
-          helm repo index ./charts --url https://example.com/your-chart-repo
+          helm package ./kubernetes/helm          
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v2
         with:
