@@ -4,7 +4,7 @@ postgres:
   db: lookup_service
 
 fastapi:
-  image: irfan611/fastapitsk:"latest"
+  image: irfan611/task:"latest"
   port: 3000
   nodePort: 30000
 persistence:
