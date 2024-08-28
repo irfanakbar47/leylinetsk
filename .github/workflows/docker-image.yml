@@ -34,6 +34,9 @@ jobs:
             run: |
               python -m pip install --upgrade pip
               pip install fastapi httpx pytest
+          - name: Set timestamp
+            id: timestamp
+            run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
           - name: Build the Docker image
             run: docker build . --file Dockerfile --tag fastapitsk:$(date +%s)
           - name: Log in to Docker Hub
@@ -43,5 +46,5 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
           - name: Tag and push Docker image
             run: |
-              docker tag fastapitsk:$(date +%s) ${{ secrets.DOCKER_USERNAME }}/fastapitsk:$(date +%s)
-              docker push ${{ secrets.DOCKER_USERNAME }}/fastapitsk:$(date +%s)
+              docker tag fastapitsk:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_USERNAME }}/fastapitsk:${{ env.TIMESTAMP }}
+              docker push ${{ secrets.DOCKER_USERNAME }}/fastapitsk:${{ env.TIMESTAMP }}
