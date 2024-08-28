@@ -80,9 +80,10 @@ jobs:
           sed -i "s/tag: .*/tag: ${TIMESTAMP}/" ./kubernetes/helm/values.yaml  
       - name: Package Helm chart
         run: |
-          helm package ./kubernetes/helm
+          TIMESTAMP=$(date +%s)
+          helm package ./kubernetes/helm --version $TIMESTAMP
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v2
         with:
           name: helm-chart
-          path: ./kubernetes/*.tgz
+          path: ./kubernetes/helm*.tgz
