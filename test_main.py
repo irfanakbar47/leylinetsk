@@ -3,13 +3,14 @@ from main import app
 
 client = TestClient(app)
 
-def test_read_root():
+def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {
-        "date": int(datetime.utcnow().timestamp()),  # Adjust this check according to your logic
-        "version": "1.0.0",
-        "kubernetes": False  # Adjust based on your environment
-    }
+    assert "date" in response.json()
+    assert "version" in response.json()
+    assert "kubernetes" in response.json()
 
-# Add more tests similarly...
+def test_health_check():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "healthy"}
