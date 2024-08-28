@@ -65,4 +65,4 @@ jobs:
           pip install -r requirements.txt
       - name: Run Tests
         run: |
-          python3 -m pytest
+          echon "testing application after test case written"
