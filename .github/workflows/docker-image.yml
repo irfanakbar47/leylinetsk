@@ -66,3 +66,21 @@ jobs:
       - name: Run Tests
         run: |
           echo "testing application after test case written"
+  helm-package:
+    runs-on: ubuntu-latest
+    #needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.9.2
+      - name: Package Helm chart
+        run: |
+          helm package ./kubernetes/helm
+          helm repo index ./charts --url https://example.com/your-chart-repo
+      - name: Upload Helm chart artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: helm-chart
+          path: ./kubernetes/helm/charts/*.tgz
