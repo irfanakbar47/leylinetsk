@@ -1,5 +1,13 @@
+import pytest
 from fastapi.testclient import TestClient
 from main import app
+from unittest.mock import patch
+
+# Mock the logging configuration to avoid permission errors
+@pytest.fixture(autouse=True)
+def mock_logging():
+    with patch('main.logging.basicConfig') as mock_logging:
+        yield mock_logging
 
 client = TestClient(app)
 
