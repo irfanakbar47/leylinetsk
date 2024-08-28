@@ -39,7 +39,7 @@ jobs:
             id: timestamp
             run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
           - name: Build the Docker image
-            run: docker build . --file Dockerfile --tag fastapitsk:$(date +%s)
+            run: docker build . --file Dockerfile --tag task:$(date +%s)
           - name: Log in to Docker Hub
             uses: docker/login-action@v2
             with:
@@ -47,8 +47,8 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
           - name: Tag and push Docker image
             run: |
-              docker tag fastapitsk:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_USERNAME }}/fastapitsk:${{ env.TIMESTAMP }}
-              docker push ${{ secrets.DOCKER_USERNAME }}/fastapitsk:${{ env.TIMESTAMP }}
+              docker tag task:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_USERNAME }}/task:${{ env.TIMESTAMP }}
+              docker push ${{ secrets.DOCKER_USERNAME }}/task:${{ env.TIMESTAMP }}
   test:
     runs-on: ubuntu-latest
     needs: build
