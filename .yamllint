@@ -3,4 +3,4 @@ extends: default
 
 ignore: |
   .github/workflows/*
-  kubernetes/helm/*
+  kubernetes/*
