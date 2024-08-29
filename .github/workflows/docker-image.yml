@@ -82,12 +82,14 @@ jobs:
         run: |
           sed -i "s/tag: .*/tag: ${{ env.TIMESTAMP }}/" ./kubernetes/helm/values.yaml  
       - name: Package Helm chart
-        run: helm package ./kubernetes/helm --version ${{ env.TIMESTAMP }} --destination ./kubernetes/helm/
+        run: helm package ./kubernetes/helm --version 1.0.${{ env.TIMESTAMP }} --destination ./kubernetes/helm/
       - name: List files
         run: ls -lh ./kubernetes/helm/
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v4.3.6
         with:
-          name: helm-chart-${{ env.TIMESTAMP }}
+          name: helm-chart-1.0.${{ env.TIMESTAMP }}
           path: ./kubernetes/helm/*.tgz
           overwrite: true
+          run: ls -lh ./kubernetes/helm/
+          
