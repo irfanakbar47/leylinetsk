@@ -36,6 +36,7 @@ jobs:
           pip install fastapi httpx pytest
           pip install -r requirements.txt
       - name: Set timestamp
+        id: set-timestamp
         run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag task:${{ env.TIMESTAMP }}
@@ -76,20 +77,24 @@ jobs:
         uses: azure/setup-helm@v1
         with:
           version: v3.9.2
-      - name: Echo TIMESTAMP
+      - name: Print TIMESTAMP
         run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
       - name: Update Helm values
         run: |
-          sed -i "s/tag: .*/tag: ${{ env.TIMESTAMP }}/" ./kubernetes/helm/values.yaml  
+          sed -i "s/tag: .*/tag: ${{ env.TIMESTAMP }}/" ./kubernetes/helm/values.yaml
+      - name: Verify Version Format
+        run: |
+          TIMESTAMP=$(date +%s)
+          echo "Using version: 1.0.${TIMESTAMP}"
       - name: Package Helm chart
-        run: helm package ./kubernetes/helm --version 1.${{ env.TIMESTAMP }}
+        run: |
+          TIMESTAMP=$(date +%s)
+          helm package ./kubernetes/helm --version 1.0.${TIMESTAMP} --destination ./kubernetes/helm/
       - name: List files
         run: ls -lh ./kubernetes/helm/
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v4.3.6
         with:
-          name: helm-chart-1.${{ env.TIMESTAMP }}
+          name: helm-chart-1.0.${{ env.TIMESTAMP }}
           path: ./kubernetes/helm/*.tgz
           overwrite: true
-          run: ls -lh ./kubernetes/helm/
-          
