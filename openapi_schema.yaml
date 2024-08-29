@@ -16,6 +16,16 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.Status'
+  /metrics:
+    get:
+      summary: Metrics endpoint
+      responses:
+        '200':
+          description: Prometheus metrics
+          content:
+            text/plain:
+              schema:
+                type: string
   /health:
     get:
       summary: Show health status

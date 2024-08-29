@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import PlainTextResponse
 import socket
 import os
 import logging
@@ -9,6 +10,7 @@ from schemas import LookupRequest, LookupResponse, QueryLogResponse, HistoryResp
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import generate_latest, REGISTRY
 from pydantic import BaseModel, ValidationError
 import ipaddress
 from typing import List
@@ -55,6 +57,11 @@ async def root():
 @app.get("/health", response_model=dict)
 async def health_check():
     return {"status": "healthy"}
+
+# Metrics endpoint
+@app.get("/metrics", response_class=PlainTextResponse)
+async def metrics():
+    return generate_latest(REGISTRY).decode("utf-8")
 
 # Lookup endpoint
 @app.get("/v1/tools/lookup", response_model=LookupResponse)
