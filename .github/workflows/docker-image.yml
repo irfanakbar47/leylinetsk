@@ -81,20 +81,23 @@ jobs:
           version: v3.9.2
       - name: Load Docker image tag
         id: load-image-tag
-        run: echo "IMAGE_TAG=$(cat image_tag.txt)" >> $GITHUB_ENV
+        run: |
+          IMAGE_TAG=$(cat image_tag.txt)
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+          TIMESTAMP=${IMAGE_TAG##*:}
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
       - name: Update Helm values
         run: |
-          IMAGE_TAG=${{ env.IMAGE_TAG }}
-          TIMESTAMP=${IMAGE_TAG##*:}
+          TIMESTAMP=${{ env.TIMESTAMP }}
           sed -i "s|^\( *image: irfan611/task:\)\(.*\)|\1${TIMESTAMP}|g" ./kubernetes/helm/values.yaml
           cat ./kubernetes/helm/values.yaml  # Print file to debug
       - name: Verify Version Format
         run: |
-          TIMESTAMP=${{ env.IMAGE_TAG##*: }}
+          TIMESTAMP=${{ env.TIMESTAMP }}
           echo "Using version: 1.0.${TIMESTAMP}"
       - name: Package Helm chart
         run: |
-          TIMESTAMP=${{ env.IMAGE_TAG##*: }}
+          TIMESTAMP=${{ env.TIMESTAMP }}
           helm package ./kubernetes/helm --version 1.0.${TIMESTAMP} --destination ./kubernetes/helm/
       - name: List files
         run: ls -lh ./kubernetes/helm/
