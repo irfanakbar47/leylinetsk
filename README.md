@@ -1,6 +1,6 @@
 ## Getting Started
 
-### Prerequisites
+### Prerequisites For Deployments
 
 - Docker
 - Kubernetes (Minikube or any Kubernetes cluster)
