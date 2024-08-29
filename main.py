@@ -147,13 +147,14 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 # Logging setup
-#logging.basicConfig(level=logging.INFO)
-#logger = logging.getLogger(__name__)
+is_test_env = os.getenv("TEST_ENV") == "true"
 
-# Set up logging configuration
-log_file_path = '/app/logs/access.log'
-if not os.path.exists('/app/logs'):
-    os.makedirs('/app/logs')
+if not is_test_env:
+    log_file_path = '/app/logs/access.log'
+    if not os.path.exists('/app/logs'):
+        os.makedirs('/app/logs')
+else:
+    log_file_path = '/tmp/access.log'
 
 logging.basicConfig(
     filename=log_file_path,
@@ -161,11 +162,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-
-
-
-
 
 if __name__ == "__main__":
     import uvicorn
