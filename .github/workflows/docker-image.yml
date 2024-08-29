@@ -81,7 +81,9 @@ jobs:
         run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
       - name: Update Helm values
         run: |
-          sed -i "s/tag: .*/tag: ${{ env.TIMESTAMP }}/" ./kubernetes/helm/values.yaml
+          TIMESTAMP=$(date +%s)
+          sed -i 's/irfan611\/task:"[^"]*"/irfan611\/task:"'"${TIMESTAMP}"'"/' ./kubernetes/helm/values.yaml
+          cat ./kubernetes/helm/values.yaml  # Print file to debug
       - name: Verify Version Format
         run: |
           TIMESTAMP=$(date +%s)
