@@ -87,8 +87,10 @@ jobs:
           helm package ./kubernetes/helm --version $TIMESTAMP
       - name: List files
         run: ls -lh ./kubernetes/helm/
+      - name: Print TIMESTAMP
+        run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
       - name: Upload Helm chart artifact
         uses: actions/upload-artifact@v4.3.6
         with:
-       #   name: helm-chart-${{ env.TIMESTAMP }}
+          name: helm-chart-${{ env.TIMESTAMP }}
           path: ./kubernetes/helm/*.tgz	
