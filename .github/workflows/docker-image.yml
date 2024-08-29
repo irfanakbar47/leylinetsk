@@ -35,6 +35,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install fastapi httpx pytest
           pip install -r requirements.txt
+      - name: Run unit tests with pytest
+        run: python3 -m pytest
       - name: Set timestamp
         id: set-timestamp
         run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
@@ -56,34 +58,7 @@ jobs:
         with:
           name: image-tag
           path: image_tag.txt
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install httpx
-        pip install pytest
-
-    - name: Run tests
-      run: |
-        python3 -m pytest
-
-    - name: Run FastAPI application
-      run: |
-        uvicorn main:app --host 0.0.0.0 --port 3000 &
-        sleep 10  # Wait for the server to start
-
-    - name: Verify application is running
-      run: |
-        curl -s http://localhost:3000/health | grep "healthy"
+  
   helm-package:
     runs-on: ubuntu-latest
     needs: build
