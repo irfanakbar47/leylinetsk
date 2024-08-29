@@ -39,7 +39,11 @@ jobs:
         run: |
           nohup uvicorn main:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &
           sleep 5 
+        env:
+          TEST_ENV: true
       - name: Run unit tests with pytest
+        env:
+          TEST_ENV: true
         run: python3 -m pytest
       - name: Set timestamp
         id: set-timestamp
