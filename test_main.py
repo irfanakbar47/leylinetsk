@@ -1,24 +1,18 @@
-import pytest
 from fastapi.testclient import TestClient
 from main import app
-from unittest.mock import patch
-
-# Mock the logging configuration to avoid permission errors
-@pytest.fixture(autouse=True)
-def mock_logging():
-    with patch('main.logging.basicConfig') as mock_logging:
-        yield mock_logging
 
 client = TestClient(app)
 
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert "date" in response.json()
-    assert "version" in response.json()
-    assert "kubernetes" in response.json()
+    assert response.json() == {
+        "date": response.json()["date"],
+        "version": "1.0.0",
+        "kubernetes": False  # Adjust this based on your test environment
+    }
 
-def test_health_check():
+def test_health():
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "healthy"}
