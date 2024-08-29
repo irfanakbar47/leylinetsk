@@ -82,7 +82,7 @@ jobs:
       - name: Update Helm values
         run: |
           TIMESTAMP=$(date +%s)
-          sed -i 's/irfan611\/task:"[^"]*"/irfan611\/task:"'"${TIMESTAMP}"'"/' ./kubernetes/helm/values.yaml
+          sed -i "s|irfan611/task:[^\"]*|irfan611/task:${TIMESTAMP}|g" ./kubernetes/helm/values.yaml
           cat ./kubernetes/helm/values.yaml  # Print file to debug
       - name: Verify Version Format
         run: |
