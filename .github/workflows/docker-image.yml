@@ -49,7 +49,9 @@ jobs:
         run: |
           docker tag task:${{ env.TIMESTAMP }} ${{ secrets.DOCKER_USERNAME }}/task:${{ env.TIMESTAMP }}
           docker push ${{ secrets.DOCKER_USERNAME }}/task:${{ env.TIMESTAMP }}
-  
+      - name: Save Docker image tag
+        run: echo "IMAGE_TAG=${{ secrets.DOCKER_USERNAME }}/task:${{ env.TIMESTAMP }}" > image_tag.txt
+
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -77,20 +79,22 @@ jobs:
         uses: azure/setup-helm@v1
         with:
           version: v3.9.2
-      - name: Print TIMESTAMP
-        run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
+      - name: Load Docker image tag
+        id: load-image-tag
+        run: echo "IMAGE_TAG=$(cat image_tag.txt)" >> $GITHUB_ENV
       - name: Update Helm values
         run: |
-          TIMESTAMP=$(date +%s)
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
+          TIMESTAMP=${IMAGE_TAG##*:}
           sed -i "s|^\( *image: irfan611/task:\)\(.*\)|\1${TIMESTAMP}|g" ./kubernetes/helm/values.yaml
           cat ./kubernetes/helm/values.yaml  # Print file to debug
       - name: Verify Version Format
         run: |
-          TIMESTAMP=$(date +%s)
+          TIMESTAMP=${{ env.IMAGE_TAG##*: }}
           echo "Using version: 1.0.${TIMESTAMP}"
       - name: Package Helm chart
         run: |
-          TIMESTAMP=$(date +%s)
+          TIMESTAMP=${{ env.IMAGE_TAG##*: }}
           helm package ./kubernetes/helm --version 1.0.${TIMESTAMP} --destination ./kubernetes/helm/
       - name: List files
         run: ls -lh ./kubernetes/helm/
