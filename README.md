@@ -15,13 +15,15 @@
    cd leylinetsk
 
 2. **Running with docker-compose**
+   While you're in the leylinetsk directory, simply run the command below to build the necessary images and deploy the application using Docker Compose on port 3000.
    ```bash
-   while you are in leylinktsk dir, just need to run below command which will build required images and and deploy the application on docker-compose on port 3000 
+   
    docker-compose up -d --build
 
-3. **Running with kubernetes deployment**
+4. **Running with kubernetes deployment**
+   If you already have a Kubernetes cluster, you can deploy the application by running all the deployment files in the ./leylinetsk/kubernetes directory using the commands below, specifying the namespace where 
+   you want your application to be deployed.
    ```bash
-   If you already have cluster run all the deployment files in ./leylinktsk/kubernetes dir with below commands with your namespace where you want your application 
    kubectl apply -f postgres-pv.yaml
    kubectl apply -f postgres-pvc.yaml -n namespace
    kubectl apply -f db-secrets.yaml -n namespace
@@ -32,9 +34,9 @@
    kubectl apply -f postgres-deployment.yaml -n namespace
    kubectl apply -f postgres-svc.yaml -n namespace
 
-4. **Running application as helm chart**
+6. **Running application as helm chart**
+   First, install Helm, then navigate to the ./leylinetsk/kubernetes directory and run the commands below.
    ```bash
-   First need to install helm and then go to ./leylinktsk/kubernetes and run below commands
    helm package helm 
    helm install application-name application-package.tgz -n namespace
 
