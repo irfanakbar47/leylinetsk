@@ -46,7 +46,7 @@
 
 7. ****CI/CD****
   CI/CD is implemented with four stages:
-1. Lint: Lints all YAML files across directories to ensure they adhere to best practices.
-2. Build: Builds a versioned Docker image and pushes it to the Docker Hub repository.
-3. Test: Runs basic tests on the application using pytest.
-4. Helm Package: Creates a versioned Helm package for deployment.
+   1. Lint: Lints all YAML files across directories to ensure they adhere to best practices.
+   2. Build: Builds a versioned Docker image and pushes it to the Docker Hub repository.
+   3. Test: Runs basic tests on the application using pytest.
+   4. Helm Package: Creates a versioned Helm package for deployment.
