@@ -77,7 +77,7 @@ jobs:
         with:
           version: v3.9.2
       - name: Echo TIMESTAMP
-        run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
+        run: echo "TIMESTAMP=${{ env.TIMESTAMP }}" >> $GITHUB_ENV
       - name: Update Helm values
         run: |
           sed -i "s/tag: .*/tag: ${{ env.TIMESTAMP }}/" ./kubernetes/helm/values.yaml  
