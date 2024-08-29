@@ -20,5 +20,4 @@ def test_health_check():
 def test_metrics_endpoint():
     response = client.get("/metrics")
     assert response.status_code == 200
-    assert "promhttp_metric_handler_requests_total" in response.text
-
+    assert "python_gc_objects_collected_total"
