@@ -14,6 +14,7 @@ from prometheus_client import generate_latest, REGISTRY
 from pydantic import BaseModel, ValidationError
 import ipaddress
 from typing import List
+import httpx
 
 # Initialize FastAPI
 app = FastAPI()
@@ -56,7 +57,29 @@ async def root():
 # Health check endpoint
 @app.get("/health", response_model=dict)
 async def health_check():
-    return {"status": "healthy"}
+    services = {
+        "root": "/",
+        "lookup": "/v1/tools/lookup?domain=example.com",
+        "history": "/v1/history",
+        "validate": "/v1/tools/validate"
+    }
+    
+    results = {}
+    async with httpx.AsyncClient() as client:
+        for service_name, endpoint in services.items():
+            try:
+                # Sending requests to the respective endpoints
+                response = await client.get(f"http://127.0.0.1:3000{endpoint}")
+                if response.status_code == 200:
+                    results[service_name] = "healthy"
+                else:
+                    results[service_name] = f"unhealthy (status code: {response.status_code})"
+            except Exception as e:
+                results[service_name] = f"unhealthy (error: {str(e)})"
+    
+    overall_status = "healthy" if all(status == "healthy" for status in results.values()) else "unhealthy"
+    
+    return {"status": overall_status, "services": results}
 
 # Metrics endpoint
 @app.get("/metrics", response_class=PlainTextResponse)
