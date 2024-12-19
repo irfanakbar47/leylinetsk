@@ -69,7 +69,7 @@ async def health_check():
         for service_name, endpoint in services.items():
             try:
                 # Sending requests to the respective endpoints
-                response = await client.get(f"http://127.0.0.1:3000{endpoint}")
+                response = await client.get(f"http://127.0.0.1:3001{endpoint}")
                 if response.status_code == 200:
                     results[service_name] = "healthy"
                 else:
