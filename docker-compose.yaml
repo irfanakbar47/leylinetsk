@@ -20,7 +20,7 @@ services:
     environment:
       DATABASE_URL: postgres://myuser:mypassword@postgres/lookup_service
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - ./logs:/app/logs
     depends_on:
