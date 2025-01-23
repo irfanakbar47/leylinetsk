@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-  postgres:
+  postgres1:
     image: postgres:13
     container_name: postgres1
     environment:
