@@ -2,7 +2,7 @@ version: '3.3'
 services:
   postgres:
     image: postgres:13
-    container_name: postgres
+    container_name: postgres1
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
@@ -24,6 +24,6 @@ services:
     volumes:
       - ./logs:/app/logs
     depends_on:
-      - postgres
+      - postgres1
 volumes:
   postgres_data:
